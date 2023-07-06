@@ -53,72 +53,104 @@ export const devulveDatos = async (paradero) => {
         });
 
 
+        //esto lo dejo porsiacaso xD 
+
+        // const bus = await page.evaluate(() => {
+
+        //     const selectorMismoBus = '#proximo_solo_paradero';
+
+        //     const nodeList = document.querySelectorAll(selectorMismoBus);
+
+        //     let arrayBus = [];
+        //     for (let item of nodeList) {
+        //         arrayBus.push(item.innerText);
+        //     }
+
+        //     return arrayBus;
+
+        // });
 
 
-        const bus = await page.evaluate(() => {
 
+        // const siguienteBus = await page.evaluate(() => {
+
+        //     const selectorSigBus = '#siguiente_respuesta'
+
+        //     const nodeList = document.querySelectorAll(selectorSigBus);
+
+        //     let arrayBusSig = [];
+        //     for (let item of nodeList) {
+        //         arrayBusSig.push(item.innerText);
+        //     }
+
+        //     return arrayBusSig;
+
+        // });
+
+        const resultadoDeLasDosConsultas = await page.evaluate(() => {
             const selectorMismoBus = '#proximo_solo_paradero';
+            const selectorSigBus = '#siguiente_respuesta';
 
-            const nodeList = document.querySelectorAll(selectorMismoBus);
+            const nodeListMismoBus = document.querySelectorAll(selectorMismoBus);
+            const nodeListSigBus = document.querySelectorAll(selectorSigBus);
 
-            let arrayBus = [];
-            for (let item of nodeList) {
-                arrayBus.push(item.innerText);
+            const arrayBus = [];
+
+
+            const maxLength = Math.max(nodeListMismoBus.length, nodeListSigBus.length);
+
+            for (let i = 0; i < maxLength; i++) {
+                if (i < nodeListMismoBus.length) {
+                    arrayBus.push(nodeListMismoBus[i].innerText);
+                }
+
+                if (i < nodeListSigBus.length) {
+                    arrayBus.push(nodeListSigBus[i].innerText);
+                }
             }
-
             return arrayBus;
-
         });
 
 
+        //console.log(resultadoDeLasDosConsultas);
 
-        const siguienteBus = await page.evaluate(() => {
+        //console.log("********************************")
 
-            const selectorSigBus = '#siguiente_respuesta'
+        //console.log(siguienteBus);
 
-            const nodeList = document.querySelectorAll(selectorSigBus);
-
-            let arrayBusSig = [];
-            for (let item of nodeList) {
-                arrayBusSig.push(item.innerText);
-            }
-
-            return arrayBusSig;
-
+        // paso los datos a una matriz
+        const matriz = resultadoDeLasDosConsultas.map((bus) => {
+            return bus.split('\n');
         });
 
 
+        //console.log(matriz);
 
-        console.log(bus);
 
-        console.log("********************************")
-
-        console.log(siguienteBus);
-
-        //ahora trabajo con el array bus 
+        // //ahora trabajo con la matriz
 
         const clave = ['bus', 'patente', 'tiempoEstimado', 'distancia']
 
-        // const resultado = [];
+        const resultado = [];
 
 
 
-        // for (let i = 0; i < bus.length; i += 1) {
-        //     const obj = {};
-        //     obj[clave[0]] = bus[i][0];
-        //     obj[clave[1]] = bus[i][1];
-        //     obj[clave[2]] = bus[i][2];
-        //     obj[clave[3]] = bus[i][3];
-        //     resultado.push(obj);
-        // }
+        for (let i = 0; i < matriz.length; i += 1) {
+            const obj = {};
+            obj[clave[0]] = matriz[i][0];
+            obj[clave[1]] = matriz[i][1];
+            obj[clave[2]] = matriz[i][2];
+            obj[clave[3]] = matriz[i][3];
+            resultado.push(obj);
+        }
 
-        //console.log(resultado)
+        console.log(resultado)
 
         // const json =JSON.stringify(resultado);
 
         // console.log(json)
 
-        return bus;
+        return resultado;
 
     } catch (error) {
         console.error(error);
