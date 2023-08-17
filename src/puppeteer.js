@@ -112,6 +112,36 @@ export const devulveDatos = async (paradero) => {
         });
 
 
+        // si hay un paradeor con un solo recorrido o un solo bus 
+
+        const selectorUnBus = "#contenido_respuesta"
+
+        await page.waitForSelector(selectorUnBus, { timeout: 4000 }).then(() => {
+            console.log('si esta el selector de la 2da pag cuando hay solo un recorrido');
+        }).catch(e => {
+            console.log('no encontro el selector cuando hay solo un recorrido' + e);
+        });
+
+        const resultadoDeConsultaSoloUnRecorrido = await page.evaluate(() => {
+
+            const selectorMismoBus = "#proximo_respuesta"
+            const selectorBus = "#numero_parada_respuesta > span:nth-child(5)"
+
+            const nodeListMismoBus = document.querySelectorAll(selectorMismoBus);
+            const nodeBus = document.querySelectorAll(selectorBus);
+
+            const arrayBus = [];
+            for (let i = 0; i < nodeBus.length; i++) {
+                arrayBus.push(nodeBus[i].innerText);
+            }
+            for (let i = 0; i < nodeListMismoBus.length; i++) {
+                arrayBus.push(nodeListMismoBus[i].innerText);
+            }
+
+
+            return arrayBus;
+        });
+
         //console.log(resultadoDeLasDosConsultas);
 
         //console.log("********************************")
@@ -123,7 +153,11 @@ export const devulveDatos = async (paradero) => {
             return bus.split('\n');
         });
 
+        const matriz2 = resultadoDeConsultaSoloUnRecorrido.map((bus) => {
+            return bus.split('\n');
+        });
 
+        //console.log(matriz2)
         //console.log(matriz);
 
 
@@ -133,14 +167,29 @@ export const devulveDatos = async (paradero) => {
 
         const resultado = [];
 
-
-
-        for (let i = 0; i < matriz.length; i += 1) {
+        const matrizSinPrimerElemento = matriz2.slice(1);
+        for (let i = 0; i < Math.max(matriz.length, matrizSinPrimerElemento.length); i += 1) {
             const obj = {};
-            obj[clave[0]] = matriz[i][0];
-            obj[clave[1]] = matriz[i][1];
-            obj[clave[2]] = matriz[i][2];
-            obj[clave[3]] = matriz[i][3];
+
+            if (i < matriz.length) {
+                obj[clave[0]] = matriz[i][0];
+                obj[clave[1]] = matriz[i][1];
+                obj[clave[2]] = matriz[i][2];
+                obj[clave[3]] = matriz[i][3];
+            }
+
+            if (i < matrizSinPrimerElemento.length) {
+
+                // Capturamos el valor del bus del primer elemento
+                const busValue = matriz2[0][0];
+
+
+                obj[clave[0]] = busValue;
+                obj[clave[1]] = matrizSinPrimerElemento[i][0];
+                obj[clave[2]] = matrizSinPrimerElemento[i][1];
+                obj[clave[3]] = matrizSinPrimerElemento[i][2];
+            }
+
             resultado.push(obj);
         }
 

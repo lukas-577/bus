@@ -6,7 +6,7 @@ export const getDatos = async (req, res) => {
         devulveDatos(paradero).then((resultado) => {
             if (resultado.length === 0) {
                 res.status(404).json({
-                    message: 'Mal ingresado el paradero'
+                    message: 'Mal ingresado el paradero O fuera de horario de operacion para este paradero'
                 })
             }
             else {
